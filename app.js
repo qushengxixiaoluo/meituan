@@ -41,6 +41,10 @@
     setTimeout(() => t.remove(), 2400);
   }
 
+  // ========== 常量 ==========
+  // 避雷口径：全站统一（只看避雷筛选 / 避雷贴纸 / 首页本周避雷 / 避雷榜四处共用）
+  const WARN_RATING = 3.4;
+
   // ========== 状态 ==========
   const state = {
     view: "home",
@@ -81,7 +85,7 @@
   function filterDishes(list) {
     let arr = list.slice();
     if (state.onlyNew) arr = arr.filter(d => d.isNew);
-    if (state.onlyWarn) arr = arr.filter(d => d.rating <= 3.4);
+    if (state.onlyWarn) arr = arr.filter(d => d.rating <= WARN_RATING);
     if (state.minRating > 0) arr = arr.filter(d => d.rating >= state.minRating);
     if (state.maxPrice > 0) arr = arr.filter(d => d.price <= state.maxPrice);
     if (state.sort === "rating") {
@@ -111,7 +115,33 @@
   }
 
   function warnStickerHTML(rating) {
-    return rating <= 3.4 ? '<span class="sticker sticker-warn">避雷</span>' : "";
+    return rating <= WARN_RATING ? '<span class="sticker sticker-warn">避雷</span>' : "";
+  }
+
+  // 排队指数徽章：queue 支持 short/mid/long（或 短/中/长）字符串、1-3 等级、排队分钟数
+  function queueChipHTML(queue) {
+    if (queue == null || queue === "") return "";
+    const q = String(queue).trim().toLowerCase();
+    let level = "";
+    if (q === "short" || q === "短" || q === "low" || q === "低" || q === "1") level = "queue-short";
+    else if (q === "mid" || q === "medium" || q === "中" || q === "2") level = "queue-mid";
+    else if (q === "long" || q === "长" || q === "high" || q === "高" || q === "3") level = "queue-long";
+    else {
+      const n = Number(q);
+      if (!isFinite(n)) return "";
+      if (Number.isInteger(n) && n >= 1 && n <= 3) {
+        level = n === 1 ? "queue-short" : n === 2 ? "queue-mid" : "queue-long";
+      } else if (n <= 10) level = "queue-short";
+      else if (n <= 20) level = "queue-mid";
+      else level = "queue-long";
+    }
+    const label = level === "queue-short" ? "排队·短" : level === "queue-mid" ? "排队·中" : "排队·长";
+    return '<span class="queue-chip ' + level + '">' + label + "</span>";
+  }
+
+  function hoursHTML(st) {
+    if (!st || !st.hours) return "";
+    return '<div class="stall-hours">⏱ ' + esc(st.hours) + "</div>";
   }
 
   function favBtnHTML(id) {
@@ -216,8 +246,60 @@
     news.forEach(d => { html += dishRowHTML(d); });
     html += "</div></section>";
 
+    // 口碑窗口 Top3：按窗口 rating 降序取 3 个
+    const topStalls = STALLS.slice()
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, 3);
+    html += '<section class="section"><div class="section-head"><span class="section-title">🔥 口碑窗口 Top3</span><span class="title-tag">评分排序</span></div>';
+    html += '<div class="topstall-list">';
+    topStalls.forEach((st, i) => {
+      const c = canteenOf(st.canteenId);
+      html +=
+        '<div class="card topstall-card" data-gotostall="' + esc(st.id) + '">' +
+          '<div class="topstall-num">' + (i + 1) + "</div>" +
+          '<div class="topstall-emoji">' + st.emoji + "</div>" +
+          '<div class="topstall-info">' +
+            '<div class="topstall-name">' + esc(st.name) + "</div>" +
+            '<div class="topstall-sub">' + esc(c ? c.name : "") + " · " + esc(st.cuisine) + " · ★" + st.rating + "</div>" +
+          "</div>" +
+          queueChipHTML(st.queue) +
+        "</div>";
+    });
+    html += "</div></section>";
+
+    // 同学最新点评：date 倒序（稳定排序，同日期数组靠前优先）取 4 条；
+    // 模拟数据含未来日期，用户刚提交的（mine）恒置最前，保证发布后立刻可见
+    const feed = REVIEWS.slice()
+      .sort((a, b) => {
+        const am = a.mine ? 1 : 0;
+        const bm = b.mine ? 1 : 0;
+        if (am !== bm) return bm - am;
+        return String(b.date).localeCompare(String(a.date));
+      })
+      .slice(0, 4);
+    html += '<section class="section"><div class="section-head"><span class="section-title">👥 同学最新点评</span><span class="title-tag">实时</span></div>';
+    html += '<div class="feed-list">';
+    feed.forEach(r => {
+      const fd = dishOf(r.dishId);
+      const fs = fd ? stallOf(fd.stallId) : null;
+      if (!fd || !fs) return;
+      const initial = (r.author || "?").charAt(0);
+      html +=
+        '<div class="card feed-card" data-dish="' + esc(fd.id) + '">' +
+          '<div class="feed-avatar">' + esc(initial) + "</div>" +
+          '<div class="feed-head">' +
+            '<span class="feed-name">' + esc(r.author) + "</span>" +
+            starsHTML(r.stars, true) +
+            '<span class="feed-date">' + esc(r.date) + "</span>" +
+          "</div>" +
+          '<div class="feed-dish">' + esc(fd.name) + " · " + esc(fs.name) + "</div>" +
+          '<div class="feed-content">' + esc(r.content) + "</div>" +
+        "</div>";
+    });
+    html += "</div></section>";
+
     // 本周避雷：rating<=3.4 升序取 3
-    const warns = DISHES.filter(d => d.rating <= 3.4)
+    const warns = DISHES.filter(d => d.rating <= WARN_RATING)
       .sort((a, b) => a.rating - b.rating)
       .slice(0, 3);
     html += '<section class="section"><div class="section-head"><span class="section-title">⚠️ 本周避雷</span><span class="section-note">同学们亲测</span></div>';
@@ -277,7 +359,11 @@
       html += '<button class="chip' + (state.sort === k ? " active" : "") + '" data-sort="' + k + '">' + label + "</button>";
     });
     html += '<span class="filter-sep"></span>';
-    const filters = [["new", "只看新菜"], ["warn", "只看避雷"], ["minrating", "≥4.0分"]];
+    const filters = [
+      ["new", "只看新菜"],
+      ["warn", "只看避雷"],
+      ["minrating", state.minRating > 0 ? "≥" + state.minRating.toFixed(1) + "分" : "≥4.0分"]
+    ];
     filters.forEach(([k, label]) => {
       let on = false;
       if (k === "new") on = state.onlyNew;
@@ -331,8 +417,9 @@
               '<div class="stall-head">' +
                 '<div class="stall-avatar">' + st.emoji + "</div>" +
                 '<div class="stall-meta">' +
-                  '<div class="stall-name">' + esc(st.name) + " " + badgeHTML(st.badge) + "</div>" +
+                  '<div class="stall-name">' + esc(st.name) + " " + badgeHTML(st.badge) + " " + queueChipHTML(st.queue) + "</div>" +
                   '<div class="stall-sub">' + esc(st.cuisine) + " · 人均¥" + st.avg + " · ★" + st.rating + "</div>" +
+                  hoursHTML(st) +
                 "</div>" +
                 '<div class="stall-arrow">▾</div>' +
               "</div>";
@@ -365,7 +452,7 @@
         .sort((a, b) => (b.rating - a.rating) || (b.count - a.count))
         .slice(0, 10);
     } else {
-      list = DISHES.filter(d => d.rating <= 3.5)
+      list = DISHES.filter(d => d.rating <= WARN_RATING)
         .sort((a, b) => a.rating - b.rating)
         .slice(0, 10);
     }
@@ -466,10 +553,118 @@
     view.innerHTML = html;
   }
 
+  // ========== 渲染：介绍 ==========
+  function renderAbout() {
+    const view = $("#view-about");
+    if (!view) return;
+    let html = "";
+
+    // 1) about-hero
+    html +=
+      '<div class="about-hero">' +
+        "<h1>校园食堂点评推荐</h1>" +
+        '<div class="about-slogan">今天食堂吃什么？让同学的胃替你探路</div>' +
+        '<div class="about-badges">' +
+          '<span class="about-badge">纯前端</span>' +
+          '<span class="about-badge">模拟数据</span>' +
+          '<span class="about-badge">黑色描边</span>' +
+          '<span class="about-badge">课程作业</span>' +
+        "</div>" +
+      "</div>";
+
+    // 2) 项目简介
+    html +=
+      '<section class="section"><div class="section-head"><span class="section-title">💡 项目简介</span></div>' +
+        '<div class="about-card">' +
+          "<p>大学生每天都要面对「食堂吃什么」的世纪难题，可校园里并没有像大众点评那样按菜品打分的评价工具——哪家窗口好吃、哪道菜踩雷，全靠口口相传，等你知道的时候往往已经下筷了。</p>" +
+          "<p>本项目为同学提供发现新菜、避开踩雷窗口的点评与推荐：看评分、看差评摘要、看上新情报，帮你在 30 秒内决定下一顿。</p>" +
+        "</div>" +
+      "</section>";
+
+    // 3) 产品结构：5 张卡
+    const structure = [
+      { title: "首页", desc: "聚合今日情报的默认入口", tags: ["今日必吃", "新菜尝鲜", "本周避雷", "快捷入口"] },
+      { title: "食堂", desc: "按食堂浏览全部窗口与菜品", tags: ["切换食堂", "排序筛选", "关键词搜索", "窗口展开"] },
+      { title: "榜单", desc: "两份榜单一眼看清谁值得吃", tags: ["新菜热度榜", "避雷榜"] },
+      { title: "我的", desc: "收藏与点评的个人中心", tags: ["我的收藏", "我的点评", "数据统计"] },
+      { title: "弹层", desc: "菜品详情与写点评的浮层", tags: ["菜品详情", "评分分布", "写点评"] }
+    ];
+    html += '<section class="section"><div class="section-head"><span class="section-title">🧩 产品结构</span></div>';
+    html += '<div class="about-grid">';
+    structure.forEach(s => {
+      html +=
+        '<div class="about-card">' +
+          '<div class="about-card-title">' + esc(s.title) + "</div>" +
+          '<div class="about-card-desc">' + esc(s.desc) + "</div>" +
+          '<div class="about-tags">';
+      s.tags.forEach(t => { html += '<span class="tag">' + esc(t) + "</span>"; });
+      html += "</div></div>";
+    });
+    html += "</div></section>";
+
+    // 4) 功能亮点：6 张卡
+    const features = [
+      { emoji: "🍽️", title: "今日推荐", desc: "高分菜打头阵，30 秒锁定今日最佳" },
+      { emoji: "⚡", title: "新菜尝鲜", desc: "NEW 贴纸 + 上新日期，第一时间尝鲜" },
+      { emoji: "⚠️", title: "避雷预警", desc: "低分菜 + 差评摘要，下筷之前先看雷" },
+      { emoji: "🏆", title: "双榜单", desc: "新菜热度榜 / 避雷榜，谁红谁雷一目了然" },
+      { emoji: "✍️", title: "多维点评", desc: "总评 / 口味 / 性价比打分 + 快捷标签" },
+      { emoji: "🔍", title: "搜索筛选", desc: "关键词搜索 + 排序 + 筛选条，找菜快人一步" }
+    ];
+    html += '<section class="section"><div class="section-head"><span class="section-title">✨ 功能亮点</span></div>';
+    html += '<div class="feature-grid">';
+    features.forEach(f => {
+      html +=
+        '<div class="feature-card">' +
+          '<div class="feature-emoji">' + f.emoji + "</div>" +
+          '<div class="feature-title">' + esc(f.title) + "</div>" +
+          '<div class="feature-desc">' + esc(f.desc) + "</div>" +
+        "</div>";
+    });
+    html += "</div></section>";
+
+    // 5) 使用指南：4 步
+    const steps = [
+      "打开首页，先看「今日必吃」高分推荐",
+      "用快捷入口或顶部搜索直达目标",
+      "点进菜品详情，看同学的真实评价",
+      "打星写点评，帮后来人排雷"
+    ];
+    html += '<section class="section"><div class="section-head"><span class="section-title">🚀 使用指南</span></div>';
+    html += '<div class="step-list">';
+    steps.forEach((s, i) => {
+      html +=
+        '<div class="step-item">' +
+          '<span class="step-num">' + (i + 1) + "</span>" +
+          "<div>" + esc(s) + "</div>" +
+        "</div>";
+    });
+    html += "</div></section>";
+
+    // 6) 数据与技术：统计数字全部动态计算
+    html +=
+      '<section class="section"><div class="section-head"><span class="section-title">📦 数据与技术</span></div>' +
+        '<div class="data-chips">' +
+          '<span class="data-chip">' + CANTEENS.length + " 个食堂</span>" +
+          '<span class="data-chip">' + STALLS.length + " 个窗口</span>" +
+          '<span class="data-chip">' + DISHES.length + " 道菜品</span>" +
+          '<span class="data-chip">' + REVIEWS.length + " 条点评</span>" +
+        "</div>" +
+        '<div class="about-note">全部为模拟数据，刷新即重置；零外部依赖（原生 HTML / CSS / JS），双击 index.html 即可运行。</div>' +
+        '<div class="about-link-row">' +
+          '<a class="about-link" href="https://qushengxixiaoluo.github.io/meituan/" target="_blank" rel="noopener">🌐 在线访问</a>' +
+          '<a class="about-link" href="https://github.com/qushengxixiaoluo/meituan" target="_blank" rel="noopener">📦 源码</a>' +
+        "</div>" +
+      "</section>";
+
+    view.innerHTML = html;
+  }
+
   function render() {
     renderHome();
     renderCanteen();
     renderRank();
+    renderAbout();
     renderMe();
   }
 
@@ -771,7 +966,28 @@
     el = e.target.closest("[data-dish]");
     if (el) { openDetail(el.getAttribute("data-dish")); return; }
 
-    // 9. data-stall
+    // 9. data-gotostall → 跳转到食堂视图并展开目标窗口
+    el = e.target.closest("[data-gotostall]");
+    if (el) {
+      val = el.getAttribute("data-gotostall");
+      const target = stallOf(val);
+      state.view = "canteen";
+      if (target) state.canteenId = target.canteenId;
+      state.search = "";
+      const si0 = $("#searchInput");
+      if (si0) si0.value = "";
+      state.onlyNew = false;
+      state.onlyWarn = false;
+      state.minRating = 0;
+      state.maxPrice = 0;
+      state.expanded = {};
+      state.expanded[val] = true;
+      showView("canteen");
+      render();
+      return;
+    }
+
+    // 10. data-stall
     el = e.target.closest("[data-stall]");
     if (el) {
       val = el.getAttribute("data-stall");
@@ -780,10 +996,16 @@
       return;
     }
 
-    // 10. data-canteen / data-sort / data-filter / data-quick / data-ranktab / data-clearsearch
+    // 11. data-canteen / data-sort / data-filter / data-quick / data-ranktab / data-clearsearch
     el = e.target.closest("[data-canteen]");
     if (el) {
       state.canteenId = el.getAttribute("data-canteen");
+      // 搜索态下点击食堂 chip：清空搜索，切回该食堂列表（否则 chip 不高亮、点击无反馈）
+      if (state.search) {
+        state.search = "";
+        const si = $("#searchInput");
+        if (si) si.value = "";
+      }
       const first = STALLS.find(s => s.canteenId === state.canteenId);
       state.expanded = {};
       if (first) state.expanded[first.id] = true;
@@ -820,7 +1042,7 @@
       return;
     }
 
-    // 11. data-view（tab 栏 + 空状态按钮）
+    // 12. data-view（tab 栏 + 空状态按钮）
     el = e.target.closest("[data-view]");
     if (el) { showView(el.getAttribute("data-view")); return; }
   });

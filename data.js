@@ -7,18 +7,18 @@ const CANTEENS = [
 ];
 
 const STALLS = [
-  { id: "s1", canteenId: "c1", name: "香辣香锅", cuisine: "川湘味", avg: 15, rating: 4.3, emoji: "🍲", badge: "hot" },
-  { id: "s2", canteenId: "c1", name: "老王家面馆", cuisine: "面食", avg: 12, rating: 4.5, emoji: "🍜", badge: "hot" },
-  { id: "s3", canteenId: "c1", name: "麦香饼铺", cuisine: "早餐饼类", avg: 8, rating: 4.0, emoji: "🫓", badge: "" },
-  { id: "s4", canteenId: "c2", name: "川渝麻辣烫", cuisine: "麻辣烫", avg: 14, rating: 3.2, emoji: "🌶️", badge: "warn" },
-  { id: "s5", canteenId: "c2", name: "隆江猪脚饭", cuisine: "粤式快餐", avg: 16, rating: 4.6, emoji: "🍖", badge: "hot" },
-  { id: "s6", canteenId: "c2", name: "沙县小吃", cuisine: "闽式快餐", avg: 11, rating: 4.1, emoji: "🥟", badge: "" },
-  { id: "s7", canteenId: "c3", name: "铁板烧饭", cuisine: "铁板烧", avg: 15, rating: 3.9, emoji: "🍳", badge: "" },
-  { id: "s8", canteenId: "c3", name: "韩式拌饭", cuisine: "韩餐", avg: 17, rating: 4.2, emoji: "🍲", badge: "new" },
-  { id: "s9", canteenId: "c3", name: "汤面档", cuisine: "汤面", avg: 10, rating: 3.1, emoji: "🍜", badge: "warn" },
-  { id: "s10", canteenId: "c4", name: "兰州拉面", cuisine: "清真面食", avg: 14, rating: 4.4, emoji: "🍜", badge: "hot" },
-  { id: "s11", canteenId: "c4", name: "新疆大盘鸡", cuisine: "清真新疆菜", avg: 20, rating: 4.5, emoji: "🍗", badge: "new" },
-  { id: "s12", canteenId: "c3", name: "烧烤窗口", cuisine: "烧烤", avg: 18, rating: 3.4, emoji: "🍢", badge: "" }
+  { id: "s1", canteenId: "c1", name: "香辣香锅", cuisine: "川湘味", avg: 15, rating: 4.3, emoji: "🍲", badge: "hot", hours: "10:30-13:30 / 16:30-19:30", queue: "长" },
+  { id: "s2", canteenId: "c1", name: "老王家面馆", cuisine: "面食", avg: 12, rating: 4.5, emoji: "🍜", badge: "hot", hours: "06:30-09:30 / 10:30-13:30 / 16:30-19:00", queue: "长" },
+  { id: "s3", canteenId: "c1", name: "麦香饼铺", cuisine: "早餐饼类", avg: 8, rating: 4.0, emoji: "🫓", badge: "", hours: "06:30-09:30", queue: "短" },
+  { id: "s4", canteenId: "c2", name: "川渝麻辣烫", cuisine: "麻辣烫", avg: 14, rating: 3.2, emoji: "🌶️", badge: "warn", hours: "10:30-13:30 / 16:30-19:30", queue: "中" },
+  { id: "s5", canteenId: "c2", name: "隆江猪脚饭", cuisine: "粤式快餐", avg: 16, rating: 4.6, emoji: "🍖", badge: "hot", hours: "10:30-13:30 / 16:30-19:30", queue: "长" },
+  { id: "s6", canteenId: "c2", name: "沙县小吃", cuisine: "闽式快餐", avg: 11, rating: 4.1, emoji: "🥟", badge: "", hours: "10:00-13:30 / 16:30-20:00", queue: "中" },
+  { id: "s7", canteenId: "c3", name: "铁板烧饭", cuisine: "铁板烧", avg: 15, rating: 3.9, emoji: "🍳", badge: "", hours: "10:30-13:30 / 16:30-19:30", queue: "中" },
+  { id: "s8", canteenId: "c3", name: "韩式拌饭", cuisine: "韩餐", avg: 17, rating: 4.2, emoji: "🍲", badge: "new", hours: "11:00-14:00 / 16:30-19:30", queue: "中" },
+  { id: "s9", canteenId: "c3", name: "汤面档", cuisine: "汤面", avg: 10, rating: 3.1, emoji: "🍜", badge: "warn", hours: "10:30-13:30 / 16:30-19:00", queue: "短" },
+  { id: "s10", canteenId: "c4", name: "兰州拉面", cuisine: "清真面食", avg: 14, rating: 4.4, emoji: "🍜", badge: "hot", hours: "06:30-09:30 / 10:30-13:30 / 16:30-19:30", queue: "长" },
+  { id: "s11", canteenId: "c4", name: "新疆大盘鸡", cuisine: "清真新疆菜", avg: 20, rating: 4.5, emoji: "🍗", badge: "new", hours: "11:00-13:30 / 16:30-20:00", queue: "中" },
+  { id: "s12", canteenId: "c3", name: "烧烤窗口", cuisine: "烧烤", avg: 18, rating: 3.4, emoji: "🍢", badge: "", hours: "17:00-22:00", queue: "短" }
 ];
 
 const DISHES = [
@@ -49,7 +49,19 @@ const DISHES = [
   { id: "d25", stallId: "s10", name: "清汤牛肉拉面", price: 14, rating: 4.5, count: 198, emoji: "🍜", tags: ["招牌", "清真"], isNew: false, newDate: "" },
   { id: "d26", stallId: "s10", name: "手抓饭", price: 15, rating: 4.2, count: 63, emoji: "🍚", tags: ["新品", "清真"], isNew: true, newDate: "10-09" },
   { id: "d27", stallId: "s11", name: "大盘鸡拌面", price: 20, rating: 4.6, count: 141, emoji: "🍛", tags: ["招牌", "管饱"], isNew: false, newDate: "" },
-  { id: "d28", stallId: "s11", name: "疆式烤包子", price: 6, rating: 4.4, count: 77, emoji: "🥟", tags: ["新品", "小吃"], isNew: true, newDate: "10-11" }
+  { id: "d28", stallId: "s11", name: "疆式烤包子", price: 6, rating: 4.4, count: 77, emoji: "🥟", tags: ["新品", "小吃"], isNew: true, newDate: "10-11" },
+  { id: "d29", stallId: "s1", name: "干锅花菜", price: 14, rating: 4.1, count: 66, emoji: "🥬", tags: ["下饭", "微辣"], isNew: false, newDate: "" },
+  { id: "d30", stallId: "s2", name: "雪菜肉丝面", price: 12, rating: 4.3, count: 84, emoji: "🍜", tags: ["汤面", "家常"], isNew: false, newDate: "" },
+  { id: "d31", stallId: "s3", name: "红糖麻酱饼", price: 6, rating: 4.2, count: 41, emoji: "🫓", tags: ["早餐", "甜口"], isNew: true, newDate: "10-13" },
+  { id: "d32", stallId: "s4", name: "冷锅串串", price: 13, rating: 3.1, count: 57, emoji: "🍢", tags: ["踩雷", "串串"], isNew: false, newDate: "" },
+  { id: "d33", stallId: "s5", name: "白切鸡饭", price: 15, rating: 4.4, count: 92, emoji: "🍗", tags: ["粤式", "清淡"], isNew: false, newDate: "" },
+  { id: "d34", stallId: "s6", name: "葱油拌面", price: 8, rating: 4.0, count: 73, emoji: "🍝", tags: ["干拌", "便宜"], isNew: false, newDate: "" },
+  { id: "d35", stallId: "s7", name: "铁板黑椒鸡柳", price: 15, rating: 4.3, count: 78, emoji: "🍳", tags: ["铁板", "下饭"], isNew: false, newDate: "" },
+  { id: "d36", stallId: "s8", name: "韩式部队锅", price: 18, rating: 3.9, count: 45, emoji: "🍲", tags: ["韩式", "汤锅"], isNew: false, newDate: "" },
+  { id: "d37", stallId: "s9", name: "鸡蛋疙瘩汤", price: 9, rating: 3.3, count: 49, emoji: "🍜", tags: ["踩雷", "汤羹"], isNew: false, newDate: "" },
+  { id: "d38", stallId: "s10", name: "凉拌牛肉", price: 16, rating: 4.2, count: 58, emoji: "🥩", tags: ["清真", "凉菜"], isNew: false, newDate: "" },
+  { id: "d39", stallId: "s11", name: "新疆炒拉条", price: 16, rating: 4.5, count: 36, emoji: "🍜", tags: ["新品", "新疆味"], isNew: true, newDate: "10-15" },
+  { id: "d40", stallId: "s12", name: "锡纸金针菇", price: 14, rating: 4.0, count: 39, emoji: "🍄", tags: ["素菜", "夜宵"], isNew: false, newDate: "" }
 ];
 
 const REVIEWS = [
@@ -96,5 +108,27 @@ const REVIEWS = [
   { id: "r41", dishId: "d27", author: "食堂品鉴家", stars: 5, content: "大盘鸡份量惊人，鸡肉土豆都炖得入味，拌面吸满汤汁，二十块两人吃都够，必点！", date: "10-04", likes: 49 },
   { id: "r42", dishId: "d27", author: "图书馆钉子户", stars: 5, content: "加了宽皮带面，拌着汤汁吃太过瘾了，土豆绵密鸡肉大块，食堂的硬菜担当。", date: "10-07", likes: 36 },
   { id: "r43", dishId: "d27", author: "小明今天吃什么", stars: 4, content: "味道很正，就是上菜稍慢，饿着肚子等有点煎熬，建议提前去或者错峰。", date: "10-11", likes: 13 },
-  { id: "r44", dishId: "d28", author: "大一萌新", stars: 5, content: "新品烤包子必须冲！外皮酥脆掉渣，内馅羊肉洋葱香，六块钱一个，我能吃三个。", date: "10-12", likes: 29 }
+  { id: "r44", dishId: "d28", author: "大一萌新", stars: 5, content: "新品烤包子必须冲！外皮酥脆掉渣，内馅羊肉洋葱香，六块钱一个，我能吃三个。", date: "10-12", likes: 29 },
+  { id: "r45", dishId: "d29", author: "吃货学姐", stars: 4, content: "花菜炒得焦香入味，五花肉片给得也不少，微辣下饭，十四块的干锅在食堂很能打了。", date: "10-06", likes: 21 },
+  { id: "r46", dishId: "d30", author: "大一萌新", stars: 4, content: "雪菜咸香肉丝嫩滑，汤头清爽不油，十二块一碗分量足，早课前来一碗暖乎乎很舒服。", date: "10-08", likes: 17 },
+  { id: "r47", dishId: "d31", author: "夜跑人", stars: 5, content: "新品红糖麻酱饼绝了，红糖流心芝麻香浓，六块钱当早餐，趁热吃外皮酥得直掉渣。", date: "10-14", likes: 34 },
+  { id: "r48", dishId: "d32", author: "避雷针本针", stars: 1, content: "避雷！串串泡在红油里看着诱人，一口下去又咸又寡，鹌鹑蛋还有股腥味，不会再点。", date: "10-09", likes: 47 },
+  { id: "r49", dishId: "d32", author: "月底吃土人", stars: 2, content: "荤菜素菜一个价全靠自己拿，随便几串就十几块，味道还不入味，麻辣烫都比这强，亏了。", date: "10-12", likes: 30 },
+  { id: "r50", dishId: "d33", author: "干饭不排队", stars: 4, content: "鸡皮爽滑肉质嫩，蘸姜葱酱很正宗，配的青菜也新鲜，十五块的粤式快餐很可以。", date: "10-07", likes: 19 },
+  { id: "r51", dishId: "d34", author: "减肥失败第3天", stars: 4, content: "葱油熬得香，面条拌开根根挂汁，八块钱便宜大碗，就是葱油略咸，下次让阿姨少放点。", date: "10-10", likes: 15 },
+  { id: "r52", dishId: "d35", author: "干饭特种兵", stars: 5, content: "铁板端上来滋滋冒烟，黑椒味浓鸡柳嫩滑，米饭吸满酱汁，十五块的铁板饭太值了。", date: "10-11", likes: 36 },
+  { id: "r53", dishId: "d36", author: "吃货学姐", stars: 4, content: "年糕拉面午餐肉炖成一锅，汤底浓郁，十八块两个人分都够，天冷的时候来一锅太幸福。", date: "10-13", likes: 23 },
+  { id: "r54", dishId: "d37", author: "避雷针本针", stars: 1, content: "疙瘩大小不一还有面心夹生，汤寡淡得没味道，鸡蛋碎得像渣，九块钱这一碗纯属浪费。", date: "10-05", likes: 44 },
+  { id: "r55", dishId: "d37", author: "大一萌新", stars: 2, content: "本想喝口热汤暖胃，结果咸淡全无，面疙瘩坨成一团，问阿姨说一直这味，踩雷了。", date: "10-11", likes: 26 },
+  { id: "r56", dishId: "d38", author: "食堂品鉴家", stars: 5, content: "牛肉切得薄而完整，凉拌汁酸辣开胃，清真窗口的硬菜，十六块的拌牛肉外面得翻倍。", date: "10-09", likes: 38 },
+  { id: "r57", dishId: "d39", author: "小明今天吃什么", stars: 5, content: "新品炒拉条太香了，拉条筋道番茄羊肉入味，十六块一大盘，新疆同学都说这个正宗。", date: "10-16", likes: 41 },
+  { id: "r58", dishId: "d40", author: "不吃香菜", stars: 4, content: "金针菇吸满蒜蓉汤汁，锡纸包着端上来热气腾腾，素菜烧烤里最稳的一个，十四块可以。", date: "10-14", likes: 18 },
+  { id: "r59", dishId: "d1", author: "图书馆钉子户", stars: 5, content: "备考期间的固定加餐，牛肉多土豆糯，微辣锅底配米饭能吃光，吃完回图书馆继续刷题。", date: "10-13", likes: 33 },
+  { id: "r60", dishId: "d4", author: "夜跑人", stars: 5, content: "晚上跑完步来一碗，汤热面劲牛肉实在，十三块暖胃又管饱，这个点来不用排队真好。", date: "10-15", likes: 27 },
+  { id: "r61", dishId: "d12", author: "干饭特种兵", stars: 5, content: "猪脚饭的神！卤汁拌饭连吃两碗，猪脚软糯脱骨，十六块的价格在校外想都不敢想。", date: "10-14", likes: 57 },
+  { id: "r62", dishId: "d27", author: "月底吃土人", stars: 5, content: "二十块看着贵，但两个人吃到扶墙出，鸡肉土豆面条全齐，期末周囤粮首选，冲就完了。", date: "10-16", likes: 31 },
+  { id: "r63", dishId: "d10", author: "不吃香菜", stars: 1, content: "这次更离谱，丸子一咬就散像掺了粉，汤面上飘着一层油花，连两块钱的青菜都不给。", date: "10-15", likes: 53 },
+  { id: "r64", dishId: "d21", author: "干饭特种兵", stars: 2, content: "上次是汤淡，这次连面都煮过头了，紫菜蛋花依旧缺席，建议食堂直接把这档撤了算了。", date: "10-16", likes: 42 },
+  { id: "r65", dishId: "d5", author: "夜跑人", stars: 4, content: "炸酱咸香面条筋道，加两勺醋拌着吃更爽，分量对女生略多男生刚好，性价比一直在线。", date: "10-12", likes: 12 },
+  { id: "r66", dishId: "d19", author: "减肥失败第3天", stars: 5, content: "石锅拌饭回购第三次了，锅巴是灵魂，酱料辣度可以自己调，十六块的韩式拌饭没毛病。", date: "10-16", likes: 25 }
 ];
