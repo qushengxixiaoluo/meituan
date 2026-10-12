@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>校园食堂点评 · 今天吃什么</title>
+  <meta name="description" content="校园食堂菜品点评与推荐：发现新菜，避开踩雷窗口。">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo">🍚 校园食堂点评<span class="logo-sub">CAMPUS BITES</span></div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input id="searchInput" type="search" placeholder="搜菜品 / 窗口 / 食堂…" autocomplete="off">
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="tab active" data-view="home">🏠 首页</button>
+    <button class="tab" data-view="canteen">🏫 食堂</button>
+    <button class="tab" data-view="rank">🏆 榜单</button>
+    <button class="tab" data-view="me">👤 我的</button>
+  </nav>
+
+  <main class="main">
+    <section id="view-home" class="view active"></section>
+    <section id="view-canteen" class="view"></section>
+    <section id="view-rank" class="view"></section>
+    <section id="view-me" class="view"></section>
+  </main>
+
+  <div class="modal-mask hidden" id="detailModal">
+    <div class="modal-card" id="detailBody"></div>
+  </div>
+  <div class="modal-mask hidden" id="reviewModal">
+    <div class="modal-card modal-review" id="reviewBody"></div>
+  </div>
+
+  <div class="toast-box" id="toastBox"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
